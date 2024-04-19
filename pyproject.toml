@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "studentsolver"
+version = "0.1.0"
+description = ""
+authors = ["lc3267 <melvin.strobl@kit.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+dash = "^2.16.1"
+dash-bootstrap-components = "^1.6.0"
+torch = {version = "^2.2.2+cpu", source = "pytorch_cpu"}
+nevergrad = "^1.0.2"
+
+
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
