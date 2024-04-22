@@ -47,10 +47,7 @@ sidebar = html.Div(
         html.Div(
             [
                 html.H1(
-                    f"SUSI",
-                ),
-                html.H4(
-                    f"Satisfying Undecided Students Intelligently",
+                    f"The Sorting Hat",
                 ),
             ],
             className="infoBox",
@@ -227,6 +224,7 @@ def on_add_user_button_clicked(
     if username_input_value not in storage_main_data["students"]:
         storage_main_data["students"][username_input_value] = {
             "final": None,
+            "locked": False,
         }
 
     return storage_main_data
@@ -267,7 +265,7 @@ def on_add_topic_button_clicked(
 
 
 @callback(
-    Output("table-output", "children"),
+    [Output("table-output", "children"), Output("student-storage-main", "data")],
     [
         Input("student-storage-main", "data"),
     ],
@@ -282,6 +280,11 @@ def update_table(
         storage_main_data["topics"] = {}
     if "students" not in storage_main_data:
         storage_main_data["students"] = {}
+
+    for student_name, _ in sorted(storage_main_data["students"].items()):
+        for _, table_properties in storage_main_data["topics"].items():
+            if student_name not in table_properties["students"]:
+                table_properties["students"][student_name] = 2
 
     table_header = [
         html.Thead(
@@ -305,13 +308,23 @@ def update_table(
                                         "topic": topic_name,
                                     },
                                 ),
-                            ]
+                            ],
+                            style={
+                                "text-align": "center",
+                                "vertical-align": "middle",
+                            },
                         )
                         for topic_name, topic in sorted(
                             storage_main_data["topics"].items()
                         )
                     ],
-                    html.Th("Solution"),
+                    html.Th(
+                        "Solution",
+                        style={
+                            "text-align": "right",
+                            "vertical-align": "right",
+                        },
+                    ),
                 ]
             )
         )
@@ -325,31 +338,34 @@ def update_table(
                         html.Td(
                             [
                                 dbc.Button(
-                                    html.B(f"{name}"),
+                                    html.B(f"{student_name}"),
                                     color="danger",
                                     outline=True,
                                     # size="sm",
-                                    id={"type": "name-rm-button", "name": name},
+                                    id={"type": "name-rm-button", "name": student_name},
                                 ),
                                 dbc.Tooltip(
                                     "Delete this user",
-                                    target={"type": "name-rm-button", "name": name},
+                                    target={
+                                        "type": "name-rm-button",
+                                        "name": student_name,
+                                    },
                                 ),
                             ]
                         ),
                         *[
                             html.Td(
                                 gen_dropdown(
-                                    name,
+                                    student_name,
                                     topic_name,
-                                    (
-                                        properties["students"][name]
-                                        if name in properties["students"]
-                                        else 2
-                                    ),
-                                )
+                                    (topic_properties["students"][student_name]),
+                                ),
+                                style={
+                                    "text-align": "center",
+                                    "vertical-align": "middle",
+                                },
                             )
-                            for topic_name, properties in storage_main_data[
+                            for topic_name, topic_properties in storage_main_data[
                                 "topics"
                             ].items()
                         ],
@@ -357,31 +373,46 @@ def update_table(
                             [
                                 (
                                     dbc.Button(
-                                        html.B(properties["final"]),
+                                        html.B(student_properties["final"]),
                                         color="success",
                                         outline=True,
                                         # size="sm",
-                                        id={"type": "accept-name-button", "name": name},
+                                        id={
+                                            "type": "accept-name-button",
+                                            "name": student_name,
+                                        },
                                     )
-                                    if properties["final"]
+                                    if student_properties["final"]
                                     else dbc.Button(
                                         "Topic N/A",
                                         color="dark",
                                         outline=True,
                                         disabled=True,
                                         # size="sm",
-                                        id={"type": "accept-name-button", "name": name},
+                                        id={
+                                            "type": "accept-name-button",
+                                            "name": student_name,
+                                        },
                                     )
                                 ),
                                 dbc.Tooltip(
                                     "Mark as accepted",
-                                    target={"type": "accept-name-button", "name": name},
+                                    target={
+                                        "type": "accept-name-button",
+                                        "name": student_name,
+                                    },
                                 ),
-                            ]
+                            ],
+                            style={
+                                "text-align": "right",
+                                "vertical-align": "right",
+                            },
                         ),
                     ]
                 )
-                for name, properties in sorted(storage_main_data["students"].items())
+                for student_name, student_properties in sorted(
+                    storage_main_data["students"].items()
+                )
             ]
         )
     ]
@@ -391,7 +422,7 @@ def update_table(
         responsive=True,
         hover=True,
     )
-    return table
+    return [table, storage_main_data]
 
 
 @callback(
@@ -469,14 +500,14 @@ def trigger_solver(_, budget_size, storage_main_data):
     def cost(solution):
         data = copy.deepcopy(storage_main_data)
         satisfaction = 0.0
-        for sid, student_name in enumerate(sorted(data["students"].keys())):
-            topic_name = solution[sid]
+        for student_index, student_name in enumerate(sorted(data["students"].keys())):
+            topic_name = solution[student_index]
             rating = data["topics"][topic_name]["students"][student_name]
 
             data["topics"][topic_name]["seats"] -= 1
 
             if data["topics"][topic_name]["seats"] < 0:
-                satisfaction -= len(storage_main_data["topics"]) ** 2
+                satisfaction -= len(storage_main_data["topics"]) ** 4
 
             satisfaction += 2**rating
 
@@ -492,13 +523,17 @@ def trigger_solver(_, budget_size, storage_main_data):
     result = optim.minimize(cost)
 
     max_sat = 0
-    for sid, student_name in enumerate(sorted(storage_main_data["students"].keys())):
-        storage_main_data["students"][student_name]["final"] = result.value[sid]
+    for student_index, student_name in enumerate(
+        sorted(storage_main_data["students"].keys())
+    ):
+        storage_main_data["students"][student_name]["final"] = result.value[
+            student_index
+        ]
 
         best_choice = 0
-        for topic_name, topic in storage_main_data["topics"].items():
-            if topic["students"][student_name] > best_choice:
-                best_choice = topic["students"][student_name]
+        for _, topic_properties in storage_main_data["topics"].items():
+            if topic_properties["students"][student_name] > best_choice:
+                best_choice = topic_properties["students"][student_name]
         max_sat += 2**best_choice
 
     sat = 100.0 * (-result.loss) / max_sat
