@@ -5,3 +5,5 @@ Considering a number of students and a fixed number seats for each available top
 Depending on the rating and the number of available seats, the tool will then assign the topics accordingly and reports the overall satisfacation.
 
 ![Example](docs/TheSortingHatExample.png)
+
+*Of course, this is not related to the "real" [Sorting Hat](https://harrypotter.fandom.com/wiki/Sorting_Hat)*
