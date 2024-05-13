@@ -74,7 +74,7 @@ sidebar = html.Div(
                                         f"Then ask the students to rate each topic on a scale from 1 to 5.",
                                     ),
                                     html.P(
-                                        f"Finally, click 'Solve' and the tool will find a proper solution.",
+                                        f"Finally, click 'Solve' and the tool will find a proper msolution.",
                                     ),
                                     html.P(
                                         f"Play with the budget size if you think the solution is not optimal.",
@@ -104,7 +104,6 @@ sidebar = html.Div(
                             id="switch",
                             value=True,
                             className="d-inline-block ms-1",
-                            size="lg",
                             persistence=True,
                         ),
                         dbc.Label(className="fa fa-sun", html_for="switch"),
@@ -630,4 +629,4 @@ def trigger_solver(_, budget_size, storage_main_data):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=False)
