@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html, callback, State
 from typing import Any, Dict, Optional
 import dash
-from dash import html, Input, State, Output, callback, ALL
+from dash import html, Input, State, Output, callback, ALL, clientside_callback
 import dash_bootstrap_components as dbc
 import copy
 import nevergrad as ng
@@ -53,6 +53,66 @@ sidebar = html.Div(
             className="infoBox",
         ),
         html.Hr(),
+        html.Div(
+            [
+                html.Span(
+                    [
+                        dbc.Button(
+                            "Help!",
+                            id="help-button",
+                            size="sm",
+                            color="info",
+                            outline=True,
+                        ),
+                        dbc.Popover(
+                            html.Div(
+                                [
+                                    html.P(
+                                        f"Start by adding users and topics with a specific number of seats.",
+                                    ),
+                                    html.P(
+                                        f"Then ask the students to rate each topic on a scale from 1 to 5.",
+                                    ),
+                                    html.P(
+                                        f"Finally, click 'Solve' and the tool will find a proper solution.",
+                                    ),
+                                    html.P(
+                                        f"Play with the budget size if you think the solution is not optimal.",
+                                    ),
+                                    html.P(
+                                        f"You can fix a solution for a student by clicking the solution on the right and then re-run the solver.",
+                                    ),
+                                    html.P(
+                                        f"You can delete students or topics by clicking on their name.",
+                                    ),
+                                ],
+                                className="infoBox",
+                                id="help-info",
+                            ),
+                            target="help-button",
+                            trigger="focus",
+                            hide_arrow=True,
+                            body=True,
+                            offset="250,-60",
+                        ),
+                    ]
+                ),
+                html.Span(
+                    [
+                        dbc.Label(className="fa fa-moon", html_for="switch"),
+                        dbc.Switch(
+                            id="switch",
+                            value=True,
+                            className="d-inline-block ms-1",
+                            size="lg",
+                            persistence=True,
+                        ),
+                        dbc.Label(className="fa fa-sun", html_for="switch"),
+                    ],
+                    style={"float": "right"},
+                ),
+            ]
+        ),
     ],
     className="sidebar",
     id="page-sidebar",
@@ -196,6 +256,19 @@ content = html.Div(
 )
 
 app.layout = html.Div([sidebar, content])
+
+clientside_callback(
+    """
+    (switchOn) => {
+       switchOn
+         ? document.documentElement.setAttribute('data-bs-theme', 'light')
+         : document.documentElement.setAttribute('data-bs-theme', 'dark')
+       return window.dash_clientside.no_update
+    }
+    """,
+    Output("switch", "id"),
+    Input("switch", "value"),
+)
 
 
 @callback(
@@ -544,12 +617,14 @@ def trigger_solver(_, budget_size, storage_main_data):
     else:
         color = "success"
 
-    result_info = dbc.Button(
-        f"{sat:.2f}% Satisfaction",
-        # outline=True,
-        color=color,
-        disabled=True,
-        className="me-1",
+    result_info = (
+        html.H4(
+            dbc.Badge(
+                f"{sat:.2f}% Satisfaction",
+                color=color,
+                pill=True,
+            )
+        ),
     )
     return [result_info, "Solve!", storage_main_data]
 
