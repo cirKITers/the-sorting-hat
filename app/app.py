@@ -74,7 +74,7 @@ sidebar = html.Div(
                                         f"Then ask the students to rate each topic on a scale from 1 to 5.",
                                     ),
                                     html.P(
-                                        f"Finally, click 'Solve' and the tool will find a proper msolution.",
+                                        f"Finally, click 'Solve' and the tool will find a proper solution.",
                                     ),
                                     html.P(
                                         f"Play with the budget size if you think the solution is not optimal.",
