@@ -49,6 +49,9 @@ sidebar = html.Div(
                 html.H1(
                     f"The Sorting Hat",
                 ),
+                html.H1(
+                    className="fa-solid fa-hat-wizard",
+                ),
             ],
             className="infoBox",
         ),
@@ -61,7 +64,7 @@ sidebar = html.Div(
                             "Help!",
                             id="help-button",
                             size="sm",
-                            color="info",
+                            color="primary",
                             outline=True,
                         ),
                         dbc.Popover(
@@ -108,7 +111,7 @@ sidebar = html.Div(
                         ),
                         dbc.Label(className="fa fa-sun", html_for="switch"),
                     ],
-                    style={"float": "right"},
+                    style={"float": "right", "padding-top": "2px"},
                 ),
             ]
         ),
@@ -136,6 +139,7 @@ content = html.Div(
                                         dbc.Tooltip(
                                             "Name of the student/ user.",
                                             target="username-input",
+                                            placement="bottom",
                                         ),
                                     ]
                                 ),
@@ -164,6 +168,7 @@ content = html.Div(
                                         dbc.Tooltip(
                                             "Name of the topic.",
                                             target="topic-input",
+                                            placement="bottom",
                                         ),
                                     ]
                                 ),
@@ -179,6 +184,7 @@ content = html.Div(
                                         dbc.Tooltip(
                                             "Number of seats available for the topic.",
                                             target="topic-students-input",
+                                            placement="bottom",
                                         ),
                                     ]
                                 ),
@@ -209,6 +215,7 @@ content = html.Div(
                                         dbc.Tooltip(
                                             "Set the budget size for the optimization. Higher value provides more accurate results, but takes longer to compute",
                                             target="budget-size-input",
+                                            placement="bottom",
                                         ),
                                     ]
                                 ),
@@ -230,6 +237,7 @@ content = html.Div(
                                         dbc.Tooltip(
                                             "Run the optimization.",
                                             target="solve-button",
+                                            placement="bottom",
                                         ),
                                     ]
                                 ),
