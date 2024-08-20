@@ -10,8 +10,7 @@ The solver uses [nevergrad](https://github.com/facebookresearch/nevergrad) for f
 
 ## Getting started
 
-Head to this [demo site](https://ef1622d3-5380-4dfa-a196-0931e40ee13a.ka.bw-cloud-instance.org/) for playing around.
-Or start locally:
+Head to this [demo site](https://ef1622d3-5380-4dfa-a196-0931e40ee13a.ka.bw-cloud-instance.org/) for playing around or start locally:
 
 1. Clone/ download
 2. `poetry install`
