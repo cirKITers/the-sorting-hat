@@ -11,6 +11,9 @@ dash = "^2.16.1"
 dash-bootstrap-components = "^1.6.0"
 nevergrad = "^1.0.2"
 fcmaes = "^1.6.5"
+ipykernel = "^6.29.4"
+dwave-ocean-sdk = "^6.10.0"
+dimod = "^0.12.14"
 
 [build-system]
 requires = ["poetry-core"]
